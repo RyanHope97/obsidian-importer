@@ -8,6 +8,7 @@ import { KeepImporter } from './formats/keep-json';
 import { NotionImporter } from './formats/notion';
 import { OneNoteImporter } from './formats/onenote';
 import { RoamJSONImporter } from './formats/roam-json';
+import { TrelloImporter } from './formats/trello';
 import { truncateText } from './util';
 
 declare global {
@@ -254,6 +255,12 @@ export default class ImporterPlugin extends Plugin {
 				importer: RoamJSONImporter,
 				helpPermalink: 'import/roam',
 				formatDescription: 'Export your Roam Research workspace to JSON format.',
+			},
+			'trello': {
+				name: 'Trello',
+				optionText: 'Trello (.json)',
+				importer: TrelloImporter,
+				helpPermalink: 'import/trello',
 			},
 		};
 
