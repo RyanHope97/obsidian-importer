@@ -11,6 +11,7 @@ export interface TrelloJson {
 }
 
 interface TrelloList {
+	id: string;
 	name: string;
 	closed: boolean; // Archived
 }
@@ -21,6 +22,7 @@ interface TrelloCard {
 	closed: boolean; // Archived
 	attachments: TrelloAttachment[];
 	labels: TrelloLabel[];
+	idList: string;
 	// TODO: due
 	// TODO: start
 }

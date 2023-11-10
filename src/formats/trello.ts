@@ -1,7 +1,7 @@
-import { FormatImporter } from "format-importer"
-import { ImportContext } from "main";
+import { FormatImporter } from 'format-importer'
+import { ImportContext } from 'main';
 import { TrelloJson } from './trello/models';
-import { Notice, Setting } from "obsidian";
+import { Notice, Setting } from 'obsidian';
 
 export class TrelloImporter extends FormatImporter {
 	importArchived: boolean = false;
@@ -33,6 +33,15 @@ export class TrelloImporter extends FormatImporter {
 		this.addOutputLocationSetting('Trello');
 	}
 
+	// TODO:
+	// - What data sanitization do we need?
+	// - Need to handle duplicate card names correctly.
+	// - Need to decide on format for all of these.
+	// - Tags for labels?
+	// - Card start and due date.
+	// - Comments.
+	// - Attachments.
+	// - Custom fields.
 	async import(ctx: ImportContext): Promise<void> {
 		let { files } = this;
 
@@ -46,28 +55,63 @@ export class TrelloImporter extends FormatImporter {
 			new Notice('Please select a location to import your files to.');
 			return;
 		}
-		let attachmentFolderPath = `${folder.path}/Attachments`;
 
 		for (let file of files) {
 			if (ctx.isCancelled()) return;
-			console.log(file);
-
 			// Read the JSON file
 			let content = await file.readText();
 
 			// Parse the file
 			const trelloJson = JSON.parse(content) as TrelloJson;
 
-			console.log(trelloJson);
+			const boardPath = `${folder.path}/${trelloJson.name}`;
 
-			// TODO:
-			// - What data sanitization do we need?
-			// - Create folder per-board.
-			// - Create .md per-board.
-			// - Create .md per-card. Need to handle duplicate card names.
-			// - Add lists with links to cards in per-board .md.
-			// - Need to decide on format for all of these.
-			// - Tags for labels?
+			// Create folder per-board
+			const boardFolder = await this.createFolders(boardPath);
+
+			// Create markdown file per-card
+			for (let card of trelloJson.cards) {
+				if (card.closed && !this.importArchived) {
+					ctx.reportSkipped(card.name, 'Archived card');
+					continue;
+				}
+
+				let cardContent: string[] = [];
+
+				cardContent.push('# Description');
+				cardContent.push('\n\n');
+				cardContent.push(card.desc);
+
+				await this.saveAsMarkdownFile(boardFolder, card.name, cardContent.join(''));
+				ctx.reportNoteSuccess(card.name);
+			}
+
+			// Create markdown file for the board
+			let boardContent: string[] = [];
+
+			boardContent.push('# Description');
+			boardContent.push('\n\n');
+			boardContent.push(trelloJson.desc);
+			boardContent.push('\n\n');
+
+			// Get the lists
+			for (let list of trelloJson.lists) {
+				if (list.closed && !this.importArchived) {
+					ctx.reportSkipped(list.name, 'Archived list');
+					continue;
+				}
+
+				boardContent.push(`## ${list.name}`);
+				boardContent.push('\n\n');
+
+				for (let card of trelloJson.cards.filter(x => x.idList == list.id)) {
+					boardContent.push(`[[${card.name}]]`);
+					boardContent.push('\n');
+				}
+				boardContent.push('\n');
+			}
+
+			await this.saveAsMarkdownFile(boardFolder, trelloJson.name, boardContent.join(''));
 		}
 	}
 }
