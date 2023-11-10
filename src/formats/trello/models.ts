@@ -1,0 +1,46 @@
+// TODO:
+// - Lookup how to use TypeScript.
+// - Custom fields.
+
+export interface TrelloJson {
+	name: string;
+	desc: string;
+	lists: TrelloList[];
+	cards: TrelloCard[];
+	actions: TrelloAction[];
+}
+
+interface TrelloList {
+	name: string;
+	closed: boolean; // Archived
+}
+
+interface TrelloCard {
+	name: string;
+	desc: string;
+	closed: boolean; // Archived
+	attachments: TrelloAttachment[];
+	labels: TrelloLabel[];
+	// TODO: due
+	// TODO: start
+}
+
+// Comments are stored in "actions" array
+interface TrelloAction {
+	data: TrelloActionData;
+	type: string; // "commentCard", "copyCommentCard"
+}
+
+interface TrelloActionData {
+	text: string;
+}
+
+interface TrelloAttachment {
+	name: string;
+	url: string;
+}
+
+interface TrelloLabel {
+	name: string;
+	color: string;
+}
