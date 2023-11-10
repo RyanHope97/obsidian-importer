@@ -1,7 +1,9 @@
 import { FormatImporter } from 'format-importer'
 import { ImportContext } from 'main';
 import { TrelloJson } from './trello/models';
-import { Notice, Setting } from 'obsidian';
+import { FrontMatterCache, Notice, Setting } from 'obsidian';
+import { serializeFrontMatter } from '../util';
+import { sanitizeTag } from './trello/util';
 
 export class TrelloImporter extends FormatImporter {
 	importArchived: boolean = false;
@@ -37,7 +39,6 @@ export class TrelloImporter extends FormatImporter {
 	// - What data sanitization do we need?
 	// - Need to handle duplicate card names correctly.
 	// - Need to decide on format for all of these.
-	// - Tags for labels?
 	// - Card start and due date.
 	// - Comments.
 	// - Attachments.
@@ -76,7 +77,24 @@ export class TrelloImporter extends FormatImporter {
 					continue;
 				}
 
+				let frontMatter: FrontMatterCache = {};
+				let tags: string[] = [];
 				let cardContent: string[] = [];
+
+				for (let label of card.labels) {
+					if (label.name) {
+						tags.push(`Trello/Label/${label.name}`);
+					}
+					if (label.color) {
+						tags.push(`Trello/Label/${label.color}`);
+					}
+				}
+
+				if (tags.length > 0) {
+					frontMatter['tags'] = tags.map(tag => sanitizeTag(tag));
+				}
+
+				cardContent.push(serializeFrontMatter(frontMatter));
 
 				cardContent.push('# Description');
 				cardContent.push('\n\n');
