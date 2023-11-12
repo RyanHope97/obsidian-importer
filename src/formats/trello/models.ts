@@ -23,8 +23,8 @@ interface TrelloCard {
 	attachments: TrelloAttachment[];
 	labels: TrelloLabel[];
 	idList: string;
-	// TODO: due
-	// TODO: start
+	due: string;
+	start: string;
 }
 
 // Comments are stored in "actions" array

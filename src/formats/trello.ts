@@ -39,7 +39,6 @@ export class TrelloImporter extends FormatImporter {
 	// - What data sanitization do we need?
 	// - Need to handle duplicate card names correctly.
 	// - Need to decide on format for all of these.
-	// - Card start and due date.
 	// - Comments.
 	// - Attachments.
 	// - Custom fields.
@@ -92,6 +91,13 @@ export class TrelloImporter extends FormatImporter {
 
 				if (tags.length > 0) {
 					frontMatter['tags'] = tags.map(tag => sanitizeTag(tag));
+				}
+
+				if (card.start) {
+					frontMatter['start'] = card.start;
+				}
+				if (card.due) {
+					frontMatter['due'] = card.due;
 				}
 
 				cardContent.push(serializeFrontMatter(frontMatter));
