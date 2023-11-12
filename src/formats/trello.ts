@@ -93,11 +93,13 @@ export class TrelloImporter extends FormatImporter {
 					frontMatter['tags'] = tags.map(tag => sanitizeTag(tag));
 				}
 
+				// TODO: We need to set the property types
 				if (card.start) {
 					frontMatter['start'] = card.start;
 				}
 				if (card.due) {
 					frontMatter['due'] = card.due;
+					frontMatter['complete'] = card.dueComplete;
 				}
 
 				cardContent.push(serializeFrontMatter(frontMatter));

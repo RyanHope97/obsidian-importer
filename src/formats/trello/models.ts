@@ -25,6 +25,7 @@ interface TrelloCard {
 	idList: string;
 	due: string;
 	start: string;
+	dueComplete: boolean;
 }
 
 // Comments are stored in "actions" array
