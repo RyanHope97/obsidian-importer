@@ -41,9 +41,12 @@ interface TrelloActionData {
 interface TrelloAttachment {
 	name: string;
 	url: string;
+	isUpload: boolean;
 }
 
 interface TrelloLabel {
 	name: string;
 	color: string;
 }
+
+// TODO: Checklists

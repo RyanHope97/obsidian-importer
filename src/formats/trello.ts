@@ -107,6 +107,22 @@ export class TrelloImporter extends FormatImporter {
 				cardContent.push('# Description');
 				cardContent.push('\n\n');
 				cardContent.push(card.desc);
+				cardContent.push('\n\n');
+
+				cardContent.push('# Attachments');
+				cardContent.push('\n\n');
+				for (let attachment of card.attachments) {
+					if (!attachment.isUpload) {
+						cardContent.push(`[${attachment.name}](${attachment.url})`)
+						cardContent.push('\n');
+					} else if (attachment.isUpload && this.downloadAttachments) {
+						// TODO: Attachments require the user to be logged in.
+						const response = await fetch(attachment.url);
+						const data = await response.arrayBuffer();
+						await this.vault.createBinary(`${boardFolder}/Attachments/${attachment.name}`, data);
+						cardContent.push('\n');
+					}
+				}
 
 				await this.saveAsMarkdownFile(boardFolder, card.name, cardContent.join(''));
 				ctx.reportNoteSuccess(card.name);
